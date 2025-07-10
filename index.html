@@ -2,286 +2,130 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Produk All-in-One Modern</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SLAYER API - Hanzy</title>
+  <link rel="icon" href="https://i.imgur.com/lP6Hk7f.jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg: #ffffff;
-      --text: #000000;
-      --card: #f3f3f3;
-      --btn: linear-gradient(135deg, #00c6ff, #0072ff);
-      --btn-hover: linear-gradient(135deg, #0072ff, #00c6ff);
-    }
-    [data-theme="dark"] {
-      --bg: #121212;
-      --text: #ffffff;
-      --card: #1e1e1e;
-    }
-    * {
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      transition: 0.3s;
-      overflow-x: hidden;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #1e1e2f, #131320);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
     }
-    #particles-js {
-      position: fixed;
-      top: 0;
-      left: 0;
+
+    .card {
+      background: #2a2a3b;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 600px;
       width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-    header {
       text-align: center;
-      padding: 20px;
-      font-size: 2rem;
-      font-weight: bold;
+      box-shadow: 0 0 20px rgba(132, 94, 247, 0.3);
+      border: 1px solid #444;
     }
-    #welcomeText {
+
+    .card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #9370ff;
+      margin-bottom: 1rem;
+    }
+
+    .card h2 {
+      font-size: 1.6rem;
+      color: #bbaaff;
+      margin: 0.5rem 0;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      margin-top: 1.5rem;
+      font-weight: 600;
+      color: #fff;
       font-size: 1.2rem;
-      text-align: center;
-      margin-bottom: 10px;
     }
-    nav {
-      text-align: center;
-      margin-bottom: 20px;
+
+    .button-group {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
-    .btn {
-      background: var(--btn);
+
+    .button {
+      background: #7c4dff;
       color: white;
       border: none;
-      padding: 12px 20px;
-      font-size: 1rem;
-      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
       cursor: pointer;
-      margin: 6px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      font-weight: 600;
       transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
     }
-    .btn:hover {
-      background: var(--btn-hover);
-      transform: scale(1.06);
+
+    .button:hover {
+      background: #9e80ff;
+      transform: scale(1.05);
     }
-    .btn:active {
-      transform: scale(0.96);
-    }
-    .section {
-      display: none;
-      padding: 20px;
-    }
-    .active {
-      display: block;
-    }
-    .card {
-      background: var(--card);
-      padding: 15px;
-      margin: 10px auto;
-      border-radius: 15px;
-      max-width: 320px;
-      text-align: center;
-    }
-    input, select {
-      padding: 8px;
-      margin: 5px;
-      width: 80%;
-    }
-    ul { padding-left: 20px; }
-    .controls {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
-    .slider {
-      width: 150px;
-    }
-    #adminModal, #loadingOverlay {
-      position: fixed;
-      z-index: 9999;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-    #adminModal div {
-      background: var(--card);
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-    }
-    #loadingOverlay span {
-      font-size: 2rem;
-      color: white;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0); }
-      100% { transform: rotate(360deg); }
+
+    footer {
+      margin-top: 2rem;
+      color: #777;
+      font-size: 0.85rem;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
 <body>
-<div id="particles-js"></div>
-<header>🛍️ Produk All-in-One</header>
-<div id="welcomeText"></div>
-<nav>
-  <button class="btn" onclick="switchTab('produk')">Produk</button>
-  <button class="btn" onclick="switchTab('keranjang')">Keranjang</button>
-  <button class="btn" onclick="switchTab('admin')">Admin</button>
-</nav>
-<section id="produk" class="section active">
-  <div id="productList"></div>
-  <form onsubmit="submitProduct(event)">
-    <input id="newProductInput" placeholder="Nama produk baru" required />
-    <button class="btn" type="submit">➕ Tambah</button>
-  </form>
-</section>
-<section id="keranjang" class="section">
-  <h3>🧺 Isi Keranjang:</h3>
-  <ul id="cartList"></ul>
-</section>
-<section id="admin" class="section">
-  <div id="adminContent" style="display:none;">
-    <h3>📊 Statistik Produk Terjual</h3>
-    <ul id="statsList"></ul>
-    <button class="btn" onclick="resetAll()">🔁 Reset Semua</button>
-    <button class="btn" onclick="logoutAdmin()">🚪 Logout</button>
+
+  <div class="card">
+    <img src="https://i.imgur.com/lP6Hk7f.jpeg" alt="Profile">
+    <h2>❄️ Olá Eu sou Hanzyy</h2>
+    <p>私は — WhatsApp テムを破壊しようとしているボットです。賢くご利用ください。</p>
+
+    <div class="section-title">🧠 Tentang Saya (ID):</div>
+    <p>
+      Saya adalah seorang developer script bug WhatsApp yang berfokus pada pengembangan dan eksploitasi sistem WhatsApp.<br>
+      Saya juga spesialis keamanan dalam pembuatan dan pelindungan script WhatsApp — baik untuk sistem berbasis Telegram maupun langsung via WhatsApp.
+    </p>
+
+    <div class="section-title">🧠 About Me (EN):</div>
+    <p>
+      I am a WhatsApp bug script developer focused on system exploitation and security,<br>
+      including creating and securing WA bots integrated with Telegram or direct WA use.
+    </p>
+
+    <div class="section-title">🛡️ Layanan:</div>
+    <p>
+      • Pembuatan & optimasi script bug WA (FC, delay, loop, dsb.)<br>
+      • Keamanan dan patch sistem WA bot<br>
+      • Integrasi bug via Telegram bot
+    </p>
+
+    <div class="button-group">
+      <a href="https://t.me/XyHanzyy" class="button">Telegram</a>
+      <a href="https://t.me/hanzyyoffc" class="button">Channel</a>
+    </div>
   </div>
-  <div id="loginPrompt">
-    <button class="btn" onclick="showLogin()">🔐 Login Admin</button>
-  </div>
-</section>
-<div id="adminModal">
-  <div>
-    <h3>🔐 Login Admin</h3>
-    <input id="adminUser" placeholder="Username" required><br>
-    <input id="adminPass" type="password" placeholder="Password" required><br>
-    <button class="btn" onclick="loginAdmin()">Login</button>
-    <button class="btn" onclick="closeLogin()">Tutup</button>
-  </div>
-</div>
-<div id="loadingOverlay"><span>⏳</span></div>
-<script>
-  const welcomeText = document.getElementById("welcomeText");
-  const loadingOverlay = document.getElementById("loadingOverlay");
-  const products = JSON.parse(localStorage.getItem("products") || `[]`);
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  const stats = JSON.parse(localStorage.getItem("stats") || "{}");
-  const adminUser = localStorage.getItem("adminUser") || "";
-  document.addEventListener("DOMContentLoaded", () => {
-    if (adminUser) welcomeText.innerText = `👋 Halo, ${adminUser}!`;
-    renderProducts();
-    showCart();
-    particlesJS.load('particles-js', 'https://cdn.jsdelivr.net/gh/VincentGarreau/particles.js/particles.json');
-  });
-  function loading(state = true) {
-    loadingOverlay.style.display = state ? "flex" : "none";
-  }
-  function renderProducts() {
-    const container = document.getElementById("productList");
-    container.innerHTML = "";
-    products.forEach((p, i) => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <h3 contenteditable="${isAdmin()}" onblur="renameProduct(${i}, this.innerText)">${p}</h3>
-        <button class="btn" onclick="addToCart('${p}')">🛒 Beli</button>
-        ${isAdmin() ? `<button class="btn" onclick="deleteProduct(${i})">🗑️ Hapus</button>` : ''}
-      `;
-      container.appendChild(card);
-    });
-  }
-  function submitProduct(e) {
-    e.preventDefault();
-    const input = document.getElementById("newProductInput");
-    if (input.value.trim()) {
-      products.push(input.value.trim());
-      localStorage.setItem("products", JSON.stringify(products));
-      input.value = "";
-      renderProducts();
-    }
-  }
-  function renameProduct(i, name) {
-    products[i] = name.trim();
-    localStorage.setItem("products", JSON.stringify(products));
-  }
-  function deleteProduct(i) {
-    if (confirm("Hapus produk ini?")) {
-      products.splice(i, 1);
-      localStorage.setItem("products", JSON.stringify(products));
-      renderProducts();
-    }
-  }
-  function addToCart(product) {
-    cart.push(product);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    stats[product] = (stats[product] || 0) + 1;
-    localStorage.setItem("stats", JSON.stringify(stats));
-    alert(`${product} ditambahkan ke keranjang`);
-  }
-  function showCart() {
-    document.getElementById("cartList").innerHTML = cart.map(item => `<li>${item}</li>`).join("");
-  }
-  function switchTab(id) {
-    loading(true);
-    setTimeout(() => {
-      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
-      if (id === "keranjang") showCart();
-      if (id === "admin") updateStats();
-      loading(false);
-    }, 400);
-  }
-  function updateStats() {
-    const list = document.getElementById("statsList");
-    list.innerHTML = Object.entries(stats).map(([k,v]) => `<li>${k}: ${v}x</li>`).join("");
-    document.getElementById("adminContent").style.display = isAdmin() ? "block" : "none";
-    document.getElementById("loginPrompt").style.display = isAdmin() ? "none" : "block";
-  }
-  function isAdmin() {
-    return localStorage.getItem("admin") === "true";
-  }
-  function loginAdmin() {
-    const u = document.getElementById("adminUser").value;
-    const p = document.getElementById("adminPass").value;
-    if (u && p === "1234") {
-      localStorage.setItem("admin", "true");
-      localStorage.setItem("adminUser", u);
-      welcomeText.innerText = `👋 Halo, ${u}!`;
-      closeLogin();
-      renderProducts();
-      updateStats();
-    } else {
-      alert("Login salah!");
-    }
-  }
-  function logoutAdmin() {
-    localStorage.removeItem("admin");
-    localStorage.removeItem("adminUser");
-    location.reload();
-  }
-  function showLogin() {
-    document.getElementById("adminModal").style.display = "flex";
-  }
-  function closeLogin() {
-    document.getElementById("adminModal").style.display = "none";
-  }
-  function resetAll() {
-    if (confirm("Reset semua data & tema?")) {
-      localStorage.clear();
-      location.reload();
-    }
-  }
-</script>
+
+  <footer>
+    © 2025 Website Network — Powered by HanzyyOffc
+  </footer>
+
 </body>
 </html>
