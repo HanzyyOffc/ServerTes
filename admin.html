@@ -2,8 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <title>Dashboard Admin - Hanzy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Admin - Hasclaw</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
   <style>
     body {
@@ -17,19 +18,28 @@
       text-align: center;
       color: #a78bfa;
     }
+    .logout {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: crimson;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
     .grid {
       display: grid;
       gap: 1.5rem;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       margin-top: 2rem;
     }
     .card {
       background: #1e1e2f;
       padding: 1.5rem;
       border-radius: 12px;
-    }
-    .card h3 {
-      color: #c4b5fd;
     }
     input, button {
       width: 100%;
@@ -62,72 +72,88 @@
   </style>
 </head>
 <body>
-  <h1>🔐 Panel Admin - Hasclaw</h1>
-  <div class="grid">
-    <div class="card">
-      <h3>Tambah Produk</h3>
-      <input type="text" id="nama" placeholder="Nama Produk">
-      <input type="number" id="harga" placeholder="Harga">
-      <input type="text" id="deskripsi" placeholder="Deskripsi">
-      <button onclick="tambahProduk()">Tambah</button>
-    </div>
 
-    <div class="card">
-      <h3>Daftar Produk</h3>
-      <table id="tabelProduk">
-        <thead>
-          <tr><th>Nama</th><th>Harga</th><th>Deskripsi</th><th>Aksi</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+<button class="logout" onclick="logoutAdmin()">🔓 Logout</button>
+<h1>📊 Admin Panel - Hanzy</h1>
 
-    <div class="card">
-      <h3>Statistik</h3>
-      <p>Total Produk: <span id="totalProduk">0</span></p>
-      <p>Produk Terjual: <span id="produkTerjual">0</span></p>
-    </div>
-
-    <div class="card">
-      <h3>Riwayat Transaksi</h3>
-      <ul id="logTransaksi" style="font-size:14px;"></ul>
-    </div>
+<div class="grid">
+  <div class="card">
+    <h3>➕ Tambah Produk</h3>
+    <input type="text" id="nama" placeholder="Nama Produk">
+    <input type="number" id="harga" placeholder="Harga">
+    <input type="text" id="deskripsi" placeholder="Deskripsi">
+    <button onclick="tambahProduk()">Tambah</button>
   </div>
 
-  <script>
-    const produkList = [];
-    let produkTerjual = 0;
-    let logList = [];
+  <div class="card">
+    <h3>📦 Daftar Produk</h3>
+    <table id="tabelProduk">
+      <thead>
+        <tr><th>Nama</th><th>Harga</th><th>Deskripsi</th><th>Aksi</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-    function tambahProduk() {
-      const nama = document.getElementById('nama').value;
-      const harga = document.getElementById('harga').value;
-      const deskripsi = document.getElementById('deskripsi').value;
-      if (!nama || !harga || !deskripsi) return alert('Lengkapi semua data');
+  <div class="card">
+    <h3>📈 Statistik</h3>
+    <p>Total Produk: <span id="totalProduk">0</span></p>
+    <p>Produk Terjual: <span id="produkTerjual">0</span></p>
+    <canvas id="chartPenjualan" height="200"></canvas>
+  </div>
 
-      produkList.push({ nama, harga, deskripsi });
-      logList.push(`🟢 Tambah Produk: ${nama}`);
-      updateTabel();
-    }
+  <div class="card">
+    <h3>📜 Riwayat Transaksi</h3>
+    <ul id="logTransaksi" style="font-size:14px;"></ul>
+  </div>
+</div>
 
-    function jualProduk(index) {
-      logList.push(`✅ Produk Terjual: ${produkList[index].nama}`);
-      produkList.splice(index, 1);
-      produkTerjual++;
-      updateTabel();
-    }
+<script>
+  // Proteksi halaman admin
+  if (localStorage.getItem("isAdmin") !== "true") {
+    alert("❌ Akses ditolak! Silakan login dahulu.");
+    location.href = "index.html";
+  }
 
-    function hapusProduk(index) {
-      logList.push(`🗑️ Hapus Produk: ${produkList[index].nama}`);
-      produkList.splice(index, 1);
-      updateTabel();
-    }
+  const produkList = [];
+  let produkTerjual = 0;
+  const logList = [];
+  const chartData = [];
 
-    function updateTabel() {
-      const tbody = document.querySelector('#tabelProduk tbody');
-      tbody.innerHTML = '';
-      produkList.forEach((p, i) => {
-        tbody.innerHTML += `<tr>
+  function tambahProduk() {
+    const nama = document.getElementById("nama").value;
+    const harga = document.getElementById("harga").value;
+    const deskripsi = document.getElementById("deskripsi").value;
+    if (!nama || !harga || !deskripsi) return alert("⚠️ Lengkapi semua data!");
+
+    produkList.push({ nama, harga, deskripsi });
+    logList.unshift(`🟢 Tambah produk: ${nama}`);
+    updateUI();
+  }
+
+  function jualProduk(index) {
+    logList.unshift(`✅ Produk terjual: ${produkList[index].nama}`);
+    produkTerjual++;
+    const dateLabel = new Date().toLocaleDateString();
+    const found = chartData.find(d => d.tanggal === dateLabel);
+    if (found) found.jumlah++; else chartData.push({ tanggal: dateLabel, jumlah: 1 });
+
+    produkList.splice(index, 1);
+    updateUI();
+  }
+
+  function hapusProduk(index) {
+    logList.unshift(`🗑️ Hapus produk: ${produkList[index].nama}`);
+    produkList.splice(index, 1);
+    updateUI();
+  }
+
+  function updateUI() {
+    const tbody = document.querySelector("#tabelProduk tbody");
+    tbody.innerHTML = "";
+    produkList.forEach((p, i) => {
+      tbody.innerHTML += `
+        <tr>
           <td>${p.nama}</td>
           <td>Rp ${parseInt(p.harga).toLocaleString()}</td>
           <td>${p.deskripsi}</td>
@@ -135,13 +161,57 @@
             <button onclick="jualProduk(${i})">Jual</button>
             <button onclick="hapusProduk(${i})">Hapus</button>
           </td>
-        </tr>`;
-      });
+        </tr>
+      `;
+    });
 
-      document.getElementById('totalProduk').innerText = produkList.length;
-      document.getElementById('produkTerjual').innerText = produkTerjual;
-      document.getElementById('logTransaksi').innerHTML = logList.reverse().slice(0, 10).map(l => `<li>${l}</li>`).join('');
+    document.getElementById("totalProduk").innerText = produkList.length;
+    document.getElementById("produkTerjual").innerText = produkTerjual;
+    document.getElementById("logTransaksi").innerHTML = logList.slice(0, 10).map(l => `<li>${l}</li>`).join('');
+
+    updateChart();
+  }
+
+  function logoutAdmin() {
+    if (confirm("Yakin ingin logout?")) {
+      localStorage.removeItem("isAdmin");
+      location.href = "index.html";
     }
-  </script>
+  }
+
+  // Chart.js: Grafik Penjualan
+  const ctx = document.getElementById("chartPenjualan").getContext("2d");
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Produk Terjual',
+        data: [],
+        borderColor: '#7c4dff',
+        backgroundColor: 'rgba(124,77,255,0.2)',
+        borderWidth: 2,
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { labels: { color: "white" } }
+      },
+      scales: {
+        x: { ticks: { color: "white" }, grid: { color: "#333" } },
+        y: { ticks: { color: "white" }, grid: { color: "#333" } }
+      }
+    }
+  });
+
+  function updateChart() {
+    chart.data.labels = chartData.map(d => d.tanggal);
+    chart.data.datasets[0].data = chartData.map(d => d.jumlah);
+    chart.update();
+  }
+</script>
+
 </body>
 </html>
