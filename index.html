@@ -9,8 +9,8 @@
       --bg: #ffffff;
       --text: #000000;
       --card: #f3f3f3;
-      --btn: linear-gradient(135deg, #4f46e5, #6d28d9);
-      --btn-hover: linear-gradient(135deg, #6d28d9, #4f46e5);
+      --btn: linear-gradient(135deg, #00c6ff, #0072ff);
+      --btn-hover: linear-gradient(135deg, #0072ff, #00c6ff);
     }
     [data-theme="dark"] {
       --bg: #121212;
@@ -26,12 +26,26 @@
       background: var(--bg);
       color: var(--text);
       transition: 0.3s;
+      overflow-x: hidden;
+    }
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
     }
     header {
       text-align: center;
       padding: 20px;
       font-size: 2rem;
       font-weight: bold;
+    }
+    #welcomeText {
+      font-size: 1.2rem;
+      text-align: center;
+      margin-bottom: 10px;
     }
     nav {
       text-align: center;
@@ -88,13 +102,13 @@
     .slider {
       width: 150px;
     }
-    #adminModal {
-      display: none;
+    #adminModal, #loadingOverlay {
       position: fixed;
       z-index: 9999;
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.8);
+      display: none;
       justify-content: center;
       align-items: center;
     }
@@ -104,83 +118,75 @@
       border-radius: 12px;
       text-align: center;
     }
+    #loadingOverlay span {
+      font-size: 2rem;
+      color: white;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
 <body>
-
+<div id="particles-js"></div>
 <header>🛍️ Produk All-in-One</header>
-
+<div id="welcomeText"></div>
 <nav>
   <button class="btn" onclick="switchTab('produk')">Produk</button>
   <button class="btn" onclick="switchTab('keranjang')">Keranjang</button>
   <button class="btn" onclick="switchTab('admin')">Admin</button>
 </nav>
-
-<!-- SEKSI PRODUK -->
 <section id="produk" class="section active">
   <div id="productList"></div>
-  <button class="btn" onclick="addNewProduct()">➕ Tambah Produk</button>
+  <form onsubmit="submitProduct(event)">
+    <input id="newProductInput" placeholder="Nama produk baru" required />
+    <button class="btn" type="submit">➕ Tambah</button>
+  </form>
 </section>
-
-<!-- SEKSI KERANJANG -->
 <section id="keranjang" class="section">
   <h3>🧺 Isi Keranjang:</h3>
   <ul id="cartList"></ul>
 </section>
-
-<!-- SEKSI ADMIN -->
 <section id="admin" class="section">
   <div id="adminContent" style="display:none;">
     <h3>📊 Statistik Produk Terjual</h3>
     <ul id="statsList"></ul>
     <button class="btn" onclick="resetAll()">🔁 Reset Semua</button>
+    <button class="btn" onclick="logoutAdmin()">🚪 Logout</button>
   </div>
   <div id="loginPrompt">
     <button class="btn" onclick="showLogin()">🔐 Login Admin</button>
   </div>
 </section>
-
-<!-- MODAL LOGIN -->
 <div id="adminModal">
   <div>
     <h3>🔐 Login Admin</h3>
-    <input id="adminUser" placeholder="Username"><br>
-    <input id="adminPass" type="password" placeholder="Password"><br>
+    <input id="adminUser" placeholder="Username" required><br>
+    <input id="adminPass" type="password" placeholder="Password" required><br>
     <button class="btn" onclick="loginAdmin()">Login</button>
     <button class="btn" onclick="closeLogin()">Tutup</button>
   </div>
 </div>
-
-<!-- AUDIO & TOOLS -->
-<audio id="bgMusic" autoplay loop>
-  <source src="https://cdn.pixabay.com/audio/2022/03/31/audio_6b198f99ab.mp3" type="audio/mp3">
-</audio>
-<audio id="clickSound">
-  <source src="https://cdn.pixabay.com/audio/2022/10/23/audio_0d5328cfa7.mp3" type="audio/mp3">
-</audio>
-
-<div class="controls">
-  <button class="btn" onclick="toggleTheme()">🌙 Tema</button>
-  <input type="range" class="slider" id="volume" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
-  <button class="btn" onclick="nextTrack()">🎵 Next Lagu</button>
-</div>
-
+<div id="loadingOverlay"><span>⏳</span></div>
 <script>
-  const bgMusic = document.getElementById("bgMusic");
-  const clickSound = document.getElementById("clickSound");
-  const theme = localStorage.getItem("theme") || "light";
-  const playlist = [
-    "https://cdn.pixabay.com/audio/2022/03/31/audio_6b198f99ab.mp3",
-    "https://cdn.pixabay.com/audio/2022/10/25/audio_6f1fe6aa4e.mp3",
-    "https://cdn.pixabay.com/audio/2022/03/24/audio_3dc4d0e7aa.mp3"
-  ];
-  let trackIndex = 0;
-
-  document.documentElement.setAttribute("data-theme", theme);
-  const products = JSON.parse(localStorage.getItem("products") || `["Produk A", "Produk B"]`);
+  const welcomeText = document.getElementById("welcomeText");
+  const loadingOverlay = document.getElementById("loadingOverlay");
+  const products = JSON.parse(localStorage.getItem("products") || `[]`);
   const cart = JSON.parse(localStorage.getItem("cart") || "[]");
   const stats = JSON.parse(localStorage.getItem("stats") || "{}");
-
+  const adminUser = localStorage.getItem("adminUser") || "";
+  document.addEventListener("DOMContentLoaded", () => {
+    if (adminUser) welcomeText.innerText = `👋 Halo, ${adminUser}!`;
+    renderProducts();
+    showCart();
+    particlesJS.load('particles-js', 'https://cdn.jsdelivr.net/gh/VincentGarreau/particles.js/particles.json');
+  });
+  function loading(state = true) {
+    loadingOverlay.style.display = state ? "flex" : "none";
+  }
   function renderProducts() {
     const container = document.getElementById("productList");
     container.innerHTML = "";
@@ -195,70 +201,63 @@
       container.appendChild(card);
     });
   }
-
-  function saveProducts() {
-    localStorage.setItem("products", JSON.stringify(products));
-    renderProducts();
-  }
-
-  function addNewProduct() {
-    const name = prompt("Nama produk baru:");
-    if (name) {
-      products.push(name);
-      saveProducts();
+  function submitProduct(e) {
+    e.preventDefault();
+    const input = document.getElementById("newProductInput");
+    if (input.value.trim()) {
+      products.push(input.value.trim());
+      localStorage.setItem("products", JSON.stringify(products));
+      input.value = "";
+      renderProducts();
     }
   }
-
   function renameProduct(i, name) {
     products[i] = name.trim();
-    saveProducts();
+    localStorage.setItem("products", JSON.stringify(products));
   }
-
   function deleteProduct(i) {
     if (confirm("Hapus produk ini?")) {
       products.splice(i, 1);
-      saveProducts();
+      localStorage.setItem("products", JSON.stringify(products));
+      renderProducts();
     }
   }
-
   function addToCart(product) {
     cart.push(product);
     localStorage.setItem("cart", JSON.stringify(cart));
     stats[product] = (stats[product] || 0) + 1;
     localStorage.setItem("stats", JSON.stringify(stats));
     alert(`${product} ditambahkan ke keranjang`);
-    clickSound.play();
-    if (navigator.vibrate) navigator.vibrate(50);
   }
-
   function showCart() {
-    const list = document.getElementById("cartList");
-    list.innerHTML = cart.map(item => `<li>${item}</li>`).join("");
+    document.getElementById("cartList").innerHTML = cart.map(item => `<li>${item}</li>`).join("");
   }
-
   function switchTab(id) {
-    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-    if (id === "keranjang") showCart();
-    if (id === "admin") updateStats();
+    loading(true);
+    setTimeout(() => {
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      if (id === "keranjang") showCart();
+      if (id === "admin") updateStats();
+      loading(false);
+    }, 400);
   }
-
   function updateStats() {
     const list = document.getElementById("statsList");
     list.innerHTML = Object.entries(stats).map(([k,v]) => `<li>${k}: ${v}x</li>`).join("");
     document.getElementById("adminContent").style.display = isAdmin() ? "block" : "none";
     document.getElementById("loginPrompt").style.display = isAdmin() ? "none" : "block";
   }
-
   function isAdmin() {
     return localStorage.getItem("admin") === "true";
   }
-
   function loginAdmin() {
     const u = document.getElementById("adminUser").value;
     const p = document.getElementById("adminPass").value;
-    if (u === "admin" && p === "1234") {
+    if (u && p === "1234") {
       localStorage.setItem("admin", "true");
+      localStorage.setItem("adminUser", u);
+      welcomeText.innerText = `👋 Halo, ${u}!`;
       closeLogin();
       renderProducts();
       updateStats();
@@ -266,47 +265,23 @@
       alert("Login salah!");
     }
   }
-
+  function logoutAdmin() {
+    localStorage.removeItem("admin");
+    localStorage.removeItem("adminUser");
+    location.reload();
+  }
   function showLogin() {
     document.getElementById("adminModal").style.display = "flex";
   }
-
   function closeLogin() {
     document.getElementById("adminModal").style.display = "none";
   }
-
   function resetAll() {
     if (confirm("Reset semua data & tema?")) {
       localStorage.clear();
       location.reload();
     }
   }
-
-  function toggleTheme() {
-    const newTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-  }
-
-  function setVolume(val) {
-    bgMusic.volume = val;
-    clickSound.volume = val;
-  }
-
-  function nextTrack() {
-    trackIndex = (trackIndex + 1) % playlist.length;
-    bgMusic.src = playlist[trackIndex];
-    bgMusic.play();
-  }
-
-  // Autoplay fix
-  window.addEventListener('click', () => {
-    bgMusic.play();
-    clickSound.play();
-  }, { once: true });
-
-  renderProducts();
-  showCart();
 </script>
 </body>
 </html>
