@@ -2,130 +2,310 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SLAYER API - Hanzy</title>
-  <link rel="icon" href="https://i.imgur.com/lP6Hk7f.jpeg">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(145deg, #1e1e2f, #131320);
-      color: #fff;
+      background: #131322;
+      overflow-x: hidden;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
+      color: white;
+      opacity: 0;
+      animation: fadeIn 1.2s ease-in forwards;
     }
 
-    .card {
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    canvas#particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      margin: 4rem auto;
+      padding: 2rem;
       background: #2a2a3b;
       border-radius: 16px;
-      padding: 2rem;
-      max-width: 600px;
-      width: 100%;
+      box-shadow: 0 0 25px rgba(132, 94, 247, 0.3);
       text-align: center;
-      box-shadow: 0 0 20px rgba(132, 94, 247, 0.3);
-      border: 1px solid #444;
     }
 
-    .card img {
+    .container img {
       width: 120px;
       height: 120px;
-      object-fit: cover;
       border-radius: 50%;
       border: 3px solid #9370ff;
-      margin-bottom: 1rem;
     }
 
-    .card h2 {
-      font-size: 1.6rem;
-      color: #bbaaff;
-      margin: 0.5rem 0;
+    h2 {
+      color: #c9baff;
+      margin: 1rem 0 0.5rem;
     }
 
-    .card p {
-      font-size: 0.95rem;
+    p {
       color: #ccc;
+      font-size: 14px;
       line-height: 1.6;
     }
 
     .section-title {
       margin-top: 1.5rem;
-      font-weight: 600;
+      font-weight: bold;
       color: #fff;
       font-size: 1.2rem;
     }
 
-    .button-group {
+    .btn-group {
       margin-top: 2rem;
       display: flex;
       justify-content: center;
       gap: 1rem;
-      flex-wrap: wrap;
     }
 
-    .button {
+    .btn {
       background: #7c4dff;
       color: white;
+      padding: 10px 20px;
       border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 10px;
+      border-radius: 12px;
+      font-weight: bold;
       cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
+      transition: 0.3s;
       box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
     }
 
-    .button:hover {
+    .btn:hover {
       background: #9e80ff;
       transform: scale(1.05);
     }
 
     footer {
-      margin-top: 2rem;
-      color: #777;
-      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* Login Panel */
+    .login-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 5;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #2f2f48;
+      padding: 2rem;
+      border-radius: 14px;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+      position: relative;
+    }
+
+    .modal input {
+      width: 90%;
+      padding: 10px;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 10px;
+    }
+
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <img src="https://i.imgur.com/lP6Hk7f.jpeg" alt="Profile">
-    <h2>❄️ Olá Eu sou Hanzyy</h2>
-    <p>私は — WhatsApp テムを破壊しようとしているボットです。賢くご利用ください。</p>
+<canvas id="particles"></canvas>
 
-    <div class="section-title">🧠 Tentang Saya (ID):</div>
-    <p>
-      Saya adalah seorang developer script bug WhatsApp yang berfokus pada pengembangan dan eksploitasi sistem WhatsApp.<br>
-      Saya juga spesialis keamanan dalam pembuatan dan pelindungan script WhatsApp — baik untuk sistem berbasis Telegram maupun langsung via WhatsApp.
-    </p>
+<!-- Tombol Login -->
+<button class="btn login-btn" onclick="openLogin()">🔐 Login</button>
 
-    <div class="section-title">🧠 About Me (EN):</div>
-    <p>
-      I am a WhatsApp bug script developer focused on system exploitation and security,<br>
-      including creating and securing WA bots integrated with Telegram or direct WA use.
-    </p>
-
-    <div class="section-title">🛡️ Layanan:</div>
-    <p>
-      • Pembuatan & optimasi script bug WA (FC, delay, loop, dsb.)<br>
-      • Keamanan dan patch sistem WA bot<br>
-      • Integrasi bug via Telegram bot
-    </p>
-
-    <div class="button-group">
-      <a href="https://t.me/XyHanzyy" class="button">Telegram</a>
-      <a href="https://t.me/hanzyyoffc" class="button">Channel</a>
-    </div>
+<!-- Login Panel -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeLogin()">&times;</span>
+    <h3>Login Admin</h3>
+    <input type="text" id="username" placeholder="Username"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button class="btn" onclick="loginAuth()">Masuk</button>
   </div>
+</div>
 
-  <footer>
-    © 2025 Website Network — Powered by HanzyyOffc
-  </footer>
+<!-- Konten Utama -->
+<div class="container">
+  <img src="https://files.catbox.moe/xm1yx7.jpg" alt="Ren">
+  <h2>❄️ Olá Eu sou HanzyyOffc</h2>
+  <p>私は — WhatsApp テムを破壊しようとしているボットです。賢くご利用ください。</p>
+
+  <div class="section-title">🧠 Tentang Saya (ID):</div>
+  <p>Saya adalah seorang developer script bug WhatsApp yang berfokus pada pengembangan dan eksploitasi sistem WhatsApp. Saya juga spesialis keamanan dalam pembuatan dan pelindungan script WhatsApp — baik untuk sistem berbasis Telegram maupun langsung via WhatsApp.</p>
+
+  <div class="section-title">🧠 About Me (EN):</div>
+  <p>I am a WhatsApp bug script developer focused on system exploitation and security, including creating and securing WA bots integrated with Telegram or direct WA use.</p>
+
+  <div class="section-title">🛡️ Layanan:</div>
+  <p>
+    • Pembuatan & optimasi script bug WA (FC, delay, loop, dsb.)<br>
+    • Keamanan dan patch sistem WA bot<br>
+    • Integrasi bug via Telegram bot
+  </p>
+
+  <div class="btn-group">
+    <button class="btn" onclick="playClick()">Telegram</button>
+    <button class="btn" onclick="playClick()">Channel</button>
+  </div>
+</div>
+
+<footer>© 2025 SLAYER Network — Powered by Hanzy</footer>
+
+<!-- Audio Klik -->
+<audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2023/03/06/audio_658bdb84a7.mp3?filename=click-124467.mp3" preload="auto"></audio>
+
+<!-- JS Login + Audio -->
+<script>
+  const loginModal = document.getElementById("loginModal");
+
+  function openLogin() {
+    loginModal.style.display = "flex";
+    playClick();
+  }
+
+  function closeLogin() {
+    loginModal.style.display = "none";
+    playClick();
+  }
+
+  function playClick() {
+    document.getElementById("clickSound").play();
+  }
+
+  // Autentikasi admin
+  function loginAuth() {
+    playClick();
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    if (user === "admin" && pass === "091") {
+      alert("✅ Login berhasil!");
+      loginModal.style.display = "none";
+    } else {
+      alert("❌ Login gagal! Username/password salah.");
+    }
+  }
+
+  // Tutup modal saat klik luar
+  window.onclick = function(e) {
+    if (e.target == loginModal) {
+      loginModal.style.display = "none";
+    }
+  };
+</script>
+
+<!-- JS: Particles -->
+<script>
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+let particlesArray;
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+window.addEventListener("resize", function () {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  init();
+});
+
+function Particle(x, y, directionX, directionY, size, color) {
+  this.x = x;
+  this.y = y;
+  this.directionX = directionX;
+  this.directionY = directionY;
+  this.size = size;
+  this.color = color;
+}
+
+Particle.prototype.draw = function () {
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+  ctx.fillStyle = this.color;
+  ctx.fill();
+};
+
+Particle.prototype.update = function () {
+  if (this.x + this.size > canvas.width || this.x - this.size < 0) {
+    this.directionX = -this.directionX;
+  }
+  if (this.y + this.size > canvas.height || this.y - this.size < 0) {
+    this.directionY = -this.directionY;
+  }
+
+  this.x += this.directionX;
+  this.y += this.directionY;
+
+  this.draw();
+};
+
+function init() {
+  particlesArray = [];
+  for (let i = 0; i < 100; i++) {
+    let size = Math.random() * 2 + 1;
+    let x = Math.random() * (canvas.width - size * 2);
+    let y = Math.random() * (canvas.height - size * 2);
+    let directionX = (Math.random() - 0.5) * 0.5;
+    let directionY = (Math.random() - 0.5) * 0.5;
+    let color = "#ffffff";
+    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particlesArray.forEach(p => p.update());
+}
+
+init();
+animate();
+</script>
 
 </body>
 </html>
