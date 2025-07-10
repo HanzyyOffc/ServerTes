@@ -3,21 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Produk All-in-One</title>
+  <title>Produk All-in-One Modern</title>
   <style>
     :root {
       --bg: #ffffff;
       --text: #000000;
       --card: #f3f3f3;
-      --btn: #e0e0e0;
-      --btn-hover: #ccc;
+      --btn: linear-gradient(135deg, #4f46e5, #6d28d9);
+      --btn-hover: linear-gradient(135deg, #6d28d9, #4f46e5);
     }
     [data-theme="dark"] {
       --bg: #121212;
       --text: #ffffff;
       --card: #1e1e1e;
-      --btn: #2a2a2a;
-      --btn-hover: #444;
     }
     * {
       box-sizing: border-box;
@@ -41,14 +39,22 @@
     }
     .btn {
       background: var(--btn);
+      color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      border-radius: 12px;
       cursor: pointer;
-      margin: 5px;
+      margin: 6px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
     }
     .btn:hover {
       background: var(--btn-hover);
+      transform: scale(1.06);
+    }
+    .btn:active {
+      transform: scale(0.96);
     }
     .section {
       display: none;
@@ -61,20 +67,27 @@
       background: var(--card);
       padding: 15px;
       margin: 10px auto;
-      border-radius: 10px;
-      max-width: 300px;
+      border-radius: 15px;
+      max-width: 320px;
       text-align: center;
     }
-    .audio-control, .theme-toggle {
-      position: fixed;
-      bottom: 20px;
-      background: var(--btn);
-      padding: 10px;
-      border-radius: 50%;
-      cursor: pointer;
+    input, select {
+      padding: 8px;
+      margin: 5px;
+      width: 80%;
     }
-    .audio-control { right: 20px; }
-    .theme-toggle { left: 20px; }
+    ul { padding-left: 20px; }
+    .controls {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .slider {
+      width: 150px;
+    }
     #adminModal {
       display: none;
       position: fixed;
@@ -88,15 +101,9 @@
     #adminModal div {
       background: var(--card);
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 12px;
       text-align: center;
     }
-    input {
-      margin: 5px;
-      padding: 8px;
-      width: 80%;
-    }
-    ul { padding-left: 20px; }
   </style>
 </head>
 <body>
@@ -144,32 +151,35 @@
   </div>
 </div>
 
-<!-- TOGGLE & AUDIO -->
-<div class="audio-control" onclick="toggleAudio()">🔊</div>
-<div class="theme-toggle" onclick="toggleTheme()">🌙</div>
-
-<audio id="bgMusic" loop autoplay>
+<!-- AUDIO & TOOLS -->
+<audio id="bgMusic" autoplay loop>
   <source src="https://cdn.pixabay.com/audio/2022/03/31/audio_6b198f99ab.mp3" type="audio/mp3">
 </audio>
 <audio id="clickSound">
   <source src="https://cdn.pixabay.com/audio/2022/10/23/audio_0d5328cfa7.mp3" type="audio/mp3">
 </audio>
 
+<div class="controls">
+  <button class="btn" onclick="toggleTheme()">🌙 Tema</button>
+  <input type="range" class="slider" id="volume" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
+  <button class="btn" onclick="nextTrack()">🎵 Next Lagu</button>
+</div>
+
 <script>
   const bgMusic = document.getElementById("bgMusic");
   const clickSound = document.getElementById("clickSound");
-
   const theme = localStorage.getItem("theme") || "light";
-  document.documentElement.setAttribute("data-theme", theme);
+  const playlist = [
+    "https://cdn.pixabay.com/audio/2022/03/31/audio_6b198f99ab.mp3",
+    "https://cdn.pixabay.com/audio/2022/10/25/audio_6f1fe6aa4e.mp3",
+    "https://cdn.pixabay.com/audio/2022/03/24/audio_3dc4d0e7aa.mp3"
+  ];
+  let trackIndex = 0;
 
+  document.documentElement.setAttribute("data-theme", theme);
   const products = JSON.parse(localStorage.getItem("products") || `["Produk A", "Produk B"]`);
   const cart = JSON.parse(localStorage.getItem("cart") || "[]");
   const stats = JSON.parse(localStorage.getItem("stats") || "{}");
-
-  function saveProducts() {
-    localStorage.setItem("products", JSON.stringify(products));
-    renderProducts();
-  }
 
   function renderProducts() {
     const container = document.getElementById("productList");
@@ -186,6 +196,11 @@
     });
   }
 
+  function saveProducts() {
+    localStorage.setItem("products", JSON.stringify(products));
+    renderProducts();
+  }
+
   function addNewProduct() {
     const name = prompt("Nama produk baru:");
     if (name) {
@@ -194,14 +209,14 @@
     }
   }
 
-  function renameProduct(index, newName) {
-    products[index] = newName.trim();
+  function renameProduct(i, name) {
+    products[i] = name.trim();
     saveProducts();
   }
 
-  function deleteProduct(index) {
+  function deleteProduct(i) {
     if (confirm("Hapus produk ini?")) {
-      products.splice(index, 1);
+      products.splice(i, 1);
       saveProducts();
     }
   }
@@ -211,8 +226,9 @@
     localStorage.setItem("cart", JSON.stringify(cart));
     stats[product] = (stats[product] || 0) + 1;
     localStorage.setItem("stats", JSON.stringify(stats));
+    alert(`${product} ditambahkan ke keranjang`);
     clickSound.play();
-    alert(`${product} ditambahkan!`);
+    if (navigator.vibrate) navigator.vibrate(50);
   }
 
   function showCart() {
@@ -272,10 +288,22 @@
     localStorage.setItem("theme", newTheme);
   }
 
-  function toggleAudio() {
-    bgMusic.muted = !bgMusic.muted;
-    document.querySelector(".audio-control").textContent = bgMusic.muted ? "🔇" : "🔊";
+  function setVolume(val) {
+    bgMusic.volume = val;
+    clickSound.volume = val;
   }
+
+  function nextTrack() {
+    trackIndex = (trackIndex + 1) % playlist.length;
+    bgMusic.src = playlist[trackIndex];
+    bgMusic.play();
+  }
+
+  // Autoplay fix
+  window.addEventListener('click', () => {
+    bgMusic.play();
+    clickSound.play();
+  }, { once: true });
 
   renderProducts();
   showCart();
