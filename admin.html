@@ -2,25 +2,146 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin - Hasclaw</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
       background: #121222;
       color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      margin: 0;
+      padding: 2rem;
     }
     h1 {
-      color: #bfaaff;
+      text-align: center;
+      color: #a78bfa;
+    }
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      margin-top: 2rem;
+    }
+    .card {
+      background: #1e1e2f;
+      padding: 1.5rem;
+      border-radius: 12px;
+    }
+    .card h3 {
+      color: #c4b5fd;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 8px;
+    }
+    button {
+      background: #7c4dff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #a78bfa;
+    }
+    table {
+      width: 100%;
+      margin-top: 1rem;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px;
+      border-bottom: 1px solid #333;
+    }
+    th {
+      background: #2c2c3e;
     }
   </style>
 </head>
 <body>
-  <h1>Selamat Datang, Admin!</h1>
-  <p>Ini adalah halaman dashboard setelah login.</p>
+  <h1>🔐 Panel Admin - Hasclaw</h1>
+  <div class="grid">
+    <div class="card">
+      <h3>Tambah Produk</h3>
+      <input type="text" id="nama" placeholder="Nama Produk">
+      <input type="number" id="harga" placeholder="Harga">
+      <input type="text" id="deskripsi" placeholder="Deskripsi">
+      <button onclick="tambahProduk()">Tambah</button>
+    </div>
+
+    <div class="card">
+      <h3>Daftar Produk</h3>
+      <table id="tabelProduk">
+        <thead>
+          <tr><th>Nama</th><th>Harga</th><th>Deskripsi</th><th>Aksi</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Statistik</h3>
+      <p>Total Produk: <span id="totalProduk">0</span></p>
+      <p>Produk Terjual: <span id="produkTerjual">0</span></p>
+    </div>
+
+    <div class="card">
+      <h3>Riwayat Transaksi</h3>
+      <ul id="logTransaksi" style="font-size:14px;"></ul>
+    </div>
+  </div>
+
+  <script>
+    const produkList = [];
+    let produkTerjual = 0;
+    let logList = [];
+
+    function tambahProduk() {
+      const nama = document.getElementById('nama').value;
+      const harga = document.getElementById('harga').value;
+      const deskripsi = document.getElementById('deskripsi').value;
+      if (!nama || !harga || !deskripsi) return alert('Lengkapi semua data');
+
+      produkList.push({ nama, harga, deskripsi });
+      logList.push(`🟢 Tambah Produk: ${nama}`);
+      updateTabel();
+    }
+
+    function jualProduk(index) {
+      logList.push(`✅ Produk Terjual: ${produkList[index].nama}`);
+      produkList.splice(index, 1);
+      produkTerjual++;
+      updateTabel();
+    }
+
+    function hapusProduk(index) {
+      logList.push(`🗑️ Hapus Produk: ${produkList[index].nama}`);
+      produkList.splice(index, 1);
+      updateTabel();
+    }
+
+    function updateTabel() {
+      const tbody = document.querySelector('#tabelProduk tbody');
+      tbody.innerHTML = '';
+      produkList.forEach((p, i) => {
+        tbody.innerHTML += `<tr>
+          <td>${p.nama}</td>
+          <td>Rp ${parseInt(p.harga).toLocaleString()}</td>
+          <td>${p.deskripsi}</td>
+          <td>
+            <button onclick="jualProduk(${i})">Jual</button>
+            <button onclick="hapusProduk(${i})">Hapus</button>
+          </td>
+        </tr>`;
+      });
+
+      document.getElementById('totalProduk').innerText = produkList.length;
+      document.getElementById('produkTerjual').innerText = produkTerjual;
+      document.getElementById('logTransaksi').innerHTML = logList.reverse().slice(0, 10).map(l => `<li>${l}</li>`).join('');
+    }
+  </script>
 </body>
 </html>
