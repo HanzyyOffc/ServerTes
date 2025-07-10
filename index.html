@@ -3,161 +3,282 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Halaman Modern Overload</title>
+  <title>Produk All-in-One</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --card: #f3f3f3;
+      --btn: #e0e0e0;
+      --btn-hover: #ccc;
+    }
+    [data-theme="dark"] {
+      --bg: #121212;
+      --text: #ffffff;
+      --card: #1e1e1e;
+      --btn: #2a2a2a;
+      --btn-hover: #444;
+    }
     * {
-      margin: 0;
-      padding: 0;
       box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
     }
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0f0f0f, #1e1e1e);
-      color: white;
-      overflow-x: hidden;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      transition: 0.3s;
     }
-    .container {
-      padding: 40px;
+    header {
       text-align: center;
+      padding: 20px;
+      font-size: 2rem;
+      font-weight: bold;
     }
-    h1 {
-      font-size: 2.5rem;
+    nav {
+      text-align: center;
       margin-bottom: 20px;
-      animation: glitch 1s infinite;
-    }
-    @keyframes glitch {
-      0% { text-shadow: 2px 2px red; }
-      50% { text-shadow: -2px -2px blue; }
-      100% { text-shadow: 2px 2px green; }
-    }
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
     }
     .btn {
-      background: #222;
-      border: 2px solid #888;
-      color: white;
-      padding: 12px 20px;
-      font-size: 1rem;
-      border-radius: 8px;
+      background: var(--btn);
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: 0.3s ease;
-      position: relative;
+      margin: 5px;
     }
     .btn:hover {
-      background: #555;
-      transform: scale(1.05);
-      box-shadow: 0 0 10px #00ffcc;
+      background: var(--btn-hover);
     }
-    .btn:active {
-      transform: scale(0.95);
+    .section {
+      display: none;
+      padding: 20px;
     }
-    .loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
+    .active {
+      display: block;
     }
-    .loader {
-      border: 6px solid #333;
-      border-top: 6px solid #00ffcc;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
+    .card {
+      background: var(--card);
+      padding: 15px;
+      margin: 10px auto;
+      border-radius: 10px;
+      max-width: 300px;
+      text-align: center;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
-    .audio-control {
+    .audio-control, .theme-toggle {
       position: fixed;
       bottom: 20px;
-      right: 20px;
-      background: #222;
-      border: 1px solid #999;
+      background: var(--btn);
       padding: 10px;
       border-radius: 50%;
       cursor: pointer;
-      z-index: 1000;
-      transition: 0.3s ease;
     }
-    .audio-control:hover {
-      background: #00ffcc;
+    .audio-control { right: 20px; }
+    .theme-toggle { left: 20px; }
+    #adminModal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
     }
+    #adminModal div {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    input {
+      margin: 5px;
+      padding: 8px;
+      width: 80%;
+    }
+    ul { padding-left: 20px; }
   </style>
 </head>
 <body>
-  <div class="loading" id="loading">
-    <div class="loader"></div>
+
+<header>🛍️ Produk All-in-One</header>
+
+<nav>
+  <button class="btn" onclick="switchTab('produk')">Produk</button>
+  <button class="btn" onclick="switchTab('keranjang')">Keranjang</button>
+  <button class="btn" onclick="switchTab('admin')">Admin</button>
+</nav>
+
+<!-- SEKSI PRODUK -->
+<section id="produk" class="section active">
+  <div id="productList"></div>
+  <button class="btn" onclick="addNewProduct()">➕ Tambah Produk</button>
+</section>
+
+<!-- SEKSI KERANJANG -->
+<section id="keranjang" class="section">
+  <h3>🧺 Isi Keranjang:</h3>
+  <ul id="cartList"></ul>
+</section>
+
+<!-- SEKSI ADMIN -->
+<section id="admin" class="section">
+  <div id="adminContent" style="display:none;">
+    <h3>📊 Statistik Produk Terjual</h3>
+    <ul id="statsList"></ul>
+    <button class="btn" onclick="resetAll()">🔁 Reset Semua</button>
   </div>
-
-  <div class="container">
-    <h1>🔥 Halaman Overload Modern</h1>
-    <p>Silakan tekan tombol sebanyak-banyaknya!</p>
-
-    <div class="buttons">
-      <button class="btn" onclick="playClick()">Tombol 1</button>
-      <button class="btn" onclick="playClick()">Tombol 2</button>
-      <button class="btn" onclick="playClick()">Tombol 3</button>
-      <button class="btn" onclick="playClick()">Overload</button>
-      <button class="btn" onclick="playClick()">Spam</button>
-      <button class="btn" onclick="playClick()">Klik Lagi</button>
-      <button class="btn" onclick="playClick()">Penuh Tombol</button>
-      <button class="btn" onclick="playClick()">Tambah Tombol</button>
-      <button class="btn" onclick="playClick()">Goyang</button>
-      <button class="btn" onclick="playClick()">Glitch</button>
-      <button class="btn" onclick="playClick()">Lanjut</button>
-      <button class="btn" onclick="playClick()">Klik Aku</button>
-      <button class="btn" onclick="playClick()">Bisingin</button>
-      <button class="btn" onclick="playClick()">Boom!</button>
-    </div>
+  <div id="loginPrompt">
+    <button class="btn" onclick="showLogin()">🔐 Login Admin</button>
   </div>
+</section>
 
-  <div class="audio-control" onclick="toggleAudio()">
-    🔊
+<!-- MODAL LOGIN -->
+<div id="adminModal">
+  <div>
+    <h3>🔐 Login Admin</h3>
+    <input id="adminUser" placeholder="Username"><br>
+    <input id="adminPass" type="password" placeholder="Password"><br>
+    <button class="btn" onclick="loginAdmin()">Login</button>
+    <button class="btn" onclick="closeLogin()">Tutup</button>
   </div>
+</div>
 
-  <audio id="bgMusic" loop autoplay>
-    <source src="https://cdn.pixabay.com/audio/2022/03/31/audio_6b198f99ab.mp3" type="audio/mp3">
-  </audio>
+<!-- TOGGLE & AUDIO -->
+<div class="audio-control" onclick="toggleAudio()">🔊</div>
+<div class="theme-toggle" onclick="toggleTheme()">🌙</div>
 
-  <audio id="clickSound">
-    <source src="https://cdn.pixabay.com/audio/2022/10/23/audio_0d5328cfa7.mp3" type="audio/mp3">
-  </audio>
+<audio id="bgMusic" loop autoplay>
+  <source src="https://cdn.pixabay.com/audio/2022/03/31/audio_6b198f99ab.mp3" type="audio/mp3">
+</audio>
+<audio id="clickSound">
+  <source src="https://cdn.pixabay.com/audio/2022/10/23/audio_0d5328cfa7.mp3" type="audio/mp3">
+</audio>
 
-  <script>
-    // Loading screen
-    window.addEventListener("load", () => {
-      document.getElementById("loading").style.display = "none";
+<script>
+  const bgMusic = document.getElementById("bgMusic");
+  const clickSound = document.getElementById("clickSound");
+
+  const theme = localStorage.getItem("theme") || "light";
+  document.documentElement.setAttribute("data-theme", theme);
+
+  const products = JSON.parse(localStorage.getItem("products") || `["Produk A", "Produk B"]`);
+  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  const stats = JSON.parse(localStorage.getItem("stats") || "{}");
+
+  function saveProducts() {
+    localStorage.setItem("products", JSON.stringify(products));
+    renderProducts();
+  }
+
+  function renderProducts() {
+    const container = document.getElementById("productList");
+    container.innerHTML = "";
+    products.forEach((p, i) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <h3 contenteditable="${isAdmin()}" onblur="renameProduct(${i}, this.innerText)">${p}</h3>
+        <button class="btn" onclick="addToCart('${p}')">🛒 Beli</button>
+        ${isAdmin() ? `<button class="btn" onclick="deleteProduct(${i})">🗑️ Hapus</button>` : ''}
+      `;
+      container.appendChild(card);
     });
+  }
 
-    // Audio
-    const bgMusic = document.getElementById("bgMusic");
-    const clickSound = document.getElementById("clickSound");
-    let isMuted = false;
-
-    function toggleAudio() {
-      isMuted = !isMuted;
-      bgMusic.muted = isMuted;
-      document.querySelector(".audio-control").textContent = isMuted ? "🔇" : "🔊";
+  function addNewProduct() {
+    const name = prompt("Nama produk baru:");
+    if (name) {
+      products.push(name);
+      saveProducts();
     }
+  }
 
-    function playClick() {
-      clickSound.currentTime = 0;
-      clickSound.play();
+  function renameProduct(index, newName) {
+    products[index] = newName.trim();
+    saveProducts();
+  }
+
+  function deleteProduct(index) {
+    if (confirm("Hapus produk ini?")) {
+      products.splice(index, 1);
+      saveProducts();
     }
-  </script>
+  }
+
+  function addToCart(product) {
+    cart.push(product);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    stats[product] = (stats[product] || 0) + 1;
+    localStorage.setItem("stats", JSON.stringify(stats));
+    clickSound.play();
+    alert(`${product} ditambahkan!`);
+  }
+
+  function showCart() {
+    const list = document.getElementById("cartList");
+    list.innerHTML = cart.map(item => `<li>${item}</li>`).join("");
+  }
+
+  function switchTab(id) {
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    if (id === "keranjang") showCart();
+    if (id === "admin") updateStats();
+  }
+
+  function updateStats() {
+    const list = document.getElementById("statsList");
+    list.innerHTML = Object.entries(stats).map(([k,v]) => `<li>${k}: ${v}x</li>`).join("");
+    document.getElementById("adminContent").style.display = isAdmin() ? "block" : "none";
+    document.getElementById("loginPrompt").style.display = isAdmin() ? "none" : "block";
+  }
+
+  function isAdmin() {
+    return localStorage.getItem("admin") === "true";
+  }
+
+  function loginAdmin() {
+    const u = document.getElementById("adminUser").value;
+    const p = document.getElementById("adminPass").value;
+    if (u === "admin" && p === "1234") {
+      localStorage.setItem("admin", "true");
+      closeLogin();
+      renderProducts();
+      updateStats();
+    } else {
+      alert("Login salah!");
+    }
+  }
+
+  function showLogin() {
+    document.getElementById("adminModal").style.display = "flex";
+  }
+
+  function closeLogin() {
+    document.getElementById("adminModal").style.display = "none";
+  }
+
+  function resetAll() {
+    if (confirm("Reset semua data & tema?")) {
+      localStorage.clear();
+      location.reload();
+    }
+  }
+
+  function toggleTheme() {
+    const newTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+  }
+
+  function toggleAudio() {
+    bgMusic.muted = !bgMusic.muted;
+    document.querySelector(".audio-control").textContent = bgMusic.muted ? "🔇" : "🔊";
+  }
+
+  renderProducts();
+  showCart();
+</script>
 </body>
 </html>
