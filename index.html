@@ -174,14 +174,39 @@
   <p>私は — WhatsApp テムを破壊しようとしているボットです。賢くご利用ください。</p>
 
   <div class="section-title">🧠 Tentang Saya:</div>
-  <p>Saya adalah developer script bug WhatsApp yang berfokus pada eksploitasi dan keamanan, baik di bot Telegram maupun WhatsApp langsung.</p>
+  <p>🇬🇧 : Hi, I am HanzyOffc, the creator of this website, and I am a person who likes coding WhatsApp, and my love is being famous throughout Indonesia for developing coding.</p>
+  <p>🇲🇨 : Hai, nama saya HanzyOffc, sang pembuat website ini, saya adalah seorang yang hobi coding WhatsApp, dan kecintaan saya adalah menjadi terkenal di seantero Indonesia karena mengembangkan coding.</p>
 
   <div class="section-title">🛡️ Layanan:</div>
   <p>
     • Pembuatan & optimasi script bug WA<br>
     • Sistem keamanan bot WhatsApp<br>
-    • Integrasi fitur via Telegram bot
+    • Integrasi fitur via Telegram bot<br>
+    • Pembuatan base WhatsApp<br>
+    • Pembuatan base Telegram
   </p>
+
+  <div class="section-title">🛍️ Produk Tersedia:</div>
+
+  <div style="margin-top: 1rem; text-align: left;">
+    <div style="background: #1e1e30; padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
+      <strong>📦 Produk: Bot WhatsApp Premium</strong><br>
+      Harga: <span style="color:#8f82ff;">Rp100.000</span><br>
+      Deskripsi: Bot premium auto-respon, anti spam, dan fitur lengkap.
+      <div style="text-align: right; margin-top: 10px;">
+        <button class="btn" onclick="beliProduk('Bot WhatsApp Premium')">Beli Sekarang</button>
+      </div>
+    </div>
+
+    <div style="background: #1e1e30; padding: 1rem; border-radius: 12px;">
+      <strong>📦 Produk: Source Code Telegram Bot</strong><br>
+      Harga: <span style="color:#8f82ff;">Rp80.000</span><br>
+      Deskripsi: Bot Telegram auto-reply, integrasi API, dan UI clean.
+      <div style="text-align: right; margin-top: 10px;">
+        <button class="btn" onclick="beliProduk('Source Code Telegram Bot')">Beli Sekarang</button>
+      </div>
+    </div>
+  </div>
 
   <div class="btn-group">
     <button class="btn" onclick="playClick()">Telegram</button>
@@ -194,7 +219,7 @@
 <!-- Audio Klik -->
 <audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2023/03/06/audio_658bdb84a7.mp3?filename=click-124467.mp3" preload="auto"></audio>
 
-<!-- JS: Login, Audio, Auth -->
+<!-- JS Login, Audio, Produk -->
 <script>
   const loginModal = document.getElementById("loginModal");
 
@@ -226,6 +251,12 @@
     } else {
       alert("❌ Login gagal! Username/password salah.");
     }
+  }
+
+  function beliProduk(namaProduk) {
+    playClick();
+    const pesan = encodeURIComponent("Halo kak, saya tertarik membeli: " + namaProduk);
+    window.open("https://t.me/XyHanzyy?text=" + pesan, "_blank");
   }
 
   window.onclick = function(e) {
