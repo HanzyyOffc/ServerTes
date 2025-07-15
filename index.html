@@ -75,6 +75,7 @@
       display: flex;
       justify-content: center;
       gap: 1rem;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -101,51 +102,16 @@
       color: #888;
     }
 
-    /* Login Modal */
-    .login-btn {
+    #toast {
       position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 5;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 10;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.7);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background: #2f2f48;
-      padding: 2rem;
-      border-radius: 14px;
-      text-align: center;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.1);
-      position: relative;
-    }
-
-    .modal input {
-      width: 90%;
-      padding: 10px;
-      margin: 0.5rem 0;
-      border: none;
-      border-radius: 10px;
-    }
-
-    .close {
-      position: absolute;
-      top: 15px;
+      bottom: 20px;
       right: 20px;
+      background: #333;
       color: white;
-      font-size: 24px;
-      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 10px;
+      display: none;
+      z-index: 100;
     }
   </style>
 </head>
@@ -153,18 +119,6 @@
 
 <canvas id="particles"></canvas>
 
-<!-- Login Modal -->
-<div id="loginModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeLogin()">&times;</span>
-    <h3>Login Admin</h3>
-    <input type="text" id="username" placeholder="Username"><br>
-    <input type="password" id="password" placeholder="Password"><br>
-    <button class="btn" onclick="loginAuth()">Masuk</button>
-  </div>
-</div>
-
-<!-- Konten -->
 <div class="container">
   <img src="https://files.catbox.moe/xm1yx7.jpg" alt="Hanzy">
   <h2>❄️ Olá Eu sou HanzyyOffc</h2>
@@ -191,7 +145,7 @@
       Harga: <span style="color:#8f82ff;">Rp100.000</span><br>
       Deskripsi: Bot premium auto-respon, anti spam, dan fitur lengkap.
       <div style="text-align: right; margin-top: 10px;">
-        <button class="btn" onclick="beliProduk('Bot WhatsApp Premium')">Beli Sekarang</button>
+        <button class="btn beli" onclick="beliProduk('Bot WhatsApp Premium')">Beli Sekarang</button>
       </div>
     </div>
 
@@ -200,70 +154,56 @@
       Harga: <span style="color:#8f82ff;">Rp80.000</span><br>
       Deskripsi: Bot Telegram auto-reply, integrasi API, dan UI clean.
       <div style="text-align: right; margin-top: 10px;">
-        <button class="btn" onclick="beliProduk('Source Code Telegram Bot')">Beli Sekarang</button>
+        <button class="btn beli" onclick="beliProduk('Source Code Telegram Bot')">Beli Sekarang</button>
       </div>
     </div>
   </div>
 
   <div class="btn-group">
-    <button class="btn" onclick="playClick()">Telegram</button>
-    <button class="btn" onclick="playClick()">Channel</button>
+    <button class="btn" onclick="playClick(); window.open('https://t.me/XyHanzyy', '_blank')">Telegram</button>
+    <button class="btn" onclick="toggleBGM()">🎵 Musik</button>
   </div>
 </div>
 
 <footer>© 2025 SLAYER Network — Powered by Hanzy</footer>
 
-<!-- Audio Klik -->
+<!-- Toast -->
+<div id="toast">Login berhasil!</div>
+
+<!-- Audio -->
 <audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2023/03/06/audio_658bdb84a7.mp3?filename=click-124467.mp3" preload="auto"></audio>
+<audio id="bgm" src="https://cdn.pixabay.com/download/audio/2023/03/13/audio_994b1e5821.mp3?filename=lofi-study-112191.mp3" loop></audio>
 
-<!-- JS Login, Audio, Produk -->
+<!-- JavaScript -->
 <script>
-  const loginModal = document.getElementById("loginModal");
+function playClick() {
+  document.getElementById("clickSound").play();
+}
 
-  function openLogin() {
-    loginModal.style.display = "flex";
-    playClick();
-  }
+function beliProduk(namaProduk) {
+  playClick();
+  const pesan = encodeURIComponent("Halo kak, saya tertarik membeli: " + namaProduk);
+  window.open("https://t.me/XyHanzyy?text=" + pesan, "_blank");
 
-  function closeLogin() {
-    loginModal.style.display = "none";
-    playClick();
-  }
+  const toast = document.getElementById("toast");
+  toast.innerText = `✅ Mengarahkan ke Telegram untuk beli ${namaProduk}`;
+  toast.style.display = "block";
+  setTimeout(() => toast.style.display = "none", 3000);
+}
 
-  function playClick() {
+function toggleBGM() {
+  const bgm = document.getElementById("bgm");
+  bgm.paused ? bgm.play() : bgm.pause();
+}
+
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('mouseenter', () => {
     document.getElementById("clickSound").play();
-  }
-
-  function loginAuth() {
-    playClick();
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value.trim();
-
-    if (user === "admin" && pass === "091") {
-      alert("✅ Login berhasil!");
-      localStorage.setItem("isAdmin", "true");
-      setTimeout(() => {
-        window.location.href = "admin.html";
-      }, 800);
-    } else {
-      alert("❌ Login gagal! Username/password salah.");
-    }
-  }
-
-  function beliProduk(namaProduk) {
-    playClick();
-    const pesan = encodeURIComponent("Halo kak, saya tertarik membeli: " + namaProduk);
-    window.open("https://t.me/XyHanzyy?text=" + pesan, "_blank");
-  }
-
-  window.onclick = function(e) {
-    if (e.target == loginModal) {
-      loginModal.style.display = "none";
-    }
-  }
+  });
+});
 </script>
 
-<!-- JS: Partikel Background -->
+<!-- Partikel Background -->
 <script>
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
@@ -279,12 +219,8 @@ window.addEventListener("resize", () => {
 });
 
 function Particle(x, y, dx, dy, size, color) {
-  this.x = x;
-  this.y = y;
-  this.dx = dx;
-  this.dy = dy;
-  this.size = size;
-  this.color = color;
+  this.x = x; this.y = y; this.dx = dx; this.dy = dy;
+  this.size = size; this.color = color;
 }
 
 Particle.prototype.draw = function () {
@@ -297,10 +233,7 @@ Particle.prototype.draw = function () {
 Particle.prototype.update = function () {
   if (this.x + this.size > canvas.width || this.x - this.size < 0) this.dx *= -1;
   if (this.y + this.size > canvas.height || this.y - this.size < 0) this.dy *= -1;
-
-  this.x += this.dx;
-  this.y += this.dy;
-
+  this.x += this.dx; this.y += this.dy;
   this.draw();
 };
 
@@ -312,8 +245,7 @@ function initParticles() {
     let y = Math.random() * (canvas.height - size * 2);
     let dx = (Math.random() - 0.5) * 0.5;
     let dy = (Math.random() - 0.5) * 0.5;
-    let color = "#ffffff";
-    particlesArray.push(new Particle(x, y, dx, dy, size, color));
+    particlesArray.push(new Particle(x, y, dx, dy, size, "#ffffff"));
   }
 }
 
